@@ -7,7 +7,14 @@ export function usePeer(localStream, onDataReceived) {
     const [remoteStream, setRemoteStream] = useState(null);
     const peerRef = useRef(null);
 
-    // Initialize Peer
+    const streamRef = useRef(localStream);
+
+    // Keep streamRef updated
+    useEffect(() => {
+        streamRef.current = localStream;
+    }, [localStream]);
+
+    // Initialize Peer (Once)
     useEffect(() => {
         const peer = new Peer(null, {
             debug: 1,
@@ -18,6 +25,7 @@ export function usePeer(localStream, onDataReceived) {
                     { urls: 'stun:stun2.l.google.com:19302' },
                     { urls: 'stun:stun3.l.google.com:19302' },
                     { urls: 'stun:stun4.l.google.com:19302' },
+                    { urls: 'stun:global.stun.twilio.com:3478' }
                 ]
             }
         });
@@ -40,20 +48,25 @@ export function usePeer(localStream, onDataReceived) {
 
         peer.on('call', (call) => {
             console.log("Receiving call from:", call.peer);
-            if (!localStream) {
+            const currentStream = streamRef.current;
+            if (!currentStream) {
                 console.warn("No local stream to answer call with!");
-                // Try to answer anyway to establish connection (receive only?)
-                // Or better, component should ensure stream is ready.
             }
-            call.answer(localStream); // Answer with our stream
+            call.answer(currentStream); // Answer with our stream (or undefined if not ready)
 
             call.on('stream', (stream) => {
                 console.log("Received remote stream");
                 setRemoteStream(stream);
             });
 
+            call.on('close', () => {
+                console.log("Call closed");
+                setRemoteStream(null);
+            });
+
             call.on('error', (err) => {
                 console.error("Call error:", err);
+                setRemoteStream(null);
             });
         });
 
@@ -65,7 +78,7 @@ export function usePeer(localStream, onDataReceived) {
             // Actually, for React Strict Mode in dev, destroy is correct.
             peer.destroy();
         };
-    }, [localStream]); // Re-init if localStream changes to ensure fresh streams in calls
+    }, []); // Empty dependency array: Peer is stable!
 
     const handleConnection = (conn) => {
         conn.on('open', () => {
@@ -80,6 +93,10 @@ export function usePeer(localStream, onDataReceived) {
 
         conn.on('close', () => {
             setConnections(prev => prev.filter(c => c.peer !== conn.peer));
+        });
+
+        conn.on('error', (err) => {
+            console.error("Connection error:", err);
         });
     };
 
@@ -96,6 +113,13 @@ export function usePeer(localStream, onDataReceived) {
             const call = peerRef.current.call(remotePeerId, localStream);
             call.on('stream', (stream) => {
                 setRemoteStream(stream);
+            });
+            call.on('close', () => {
+                setRemoteStream(null);
+            });
+            call.on('error', (err) => {
+                console.error("Call error:", err);
+                setRemoteStream(null);
             });
         }
     };

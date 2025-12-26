@@ -341,11 +341,24 @@ function App() {
         </div>
       )}
 
+      {/* GLOBAL FLASH OVERLAY - Covers entire screen */}
+      <div className={`fixed inset-0 z-[9999] bg-white pointer-events-none transition-opacity duration-150 ease-out ${isFlashing ? 'opacity-100' : 'opacity-0'}`}></div>
+
       {/* Main Container - Retro Theme */}
       <div className="relative w-full h-full max-w-[1600px] mx-auto p-4 md:p-8 flex flex-col items-center transition-all">
 
+        {/* Mobile Landscape Floating Back Button */}
+        <button
+          onClick={() => window.location.reload()}
+          className="fixed top-4 left-4 z-50 w-10 h-10 flex items-center justify-center rounded-full bg-retro-cream/80 backdrop-blur-sm border border-[#1a2e1a]/10 text-[#1a2e1a] shadow-lg
+            hidden landscape:flex lg:landscape:hidden"
+          title="Back to Home"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+
         {/* Header - Hide on Mobile Landscape to save space */}
-        <header className="w-full flex justify-between items-center mb-4 z-10 shrink-0 landscape:hidden md:landscape:flex">
+        <header className="w-full flex justify-between items-center mb-4 z-10 shrink-0 landscape:hidden lg:landscape:flex">
           <div className="w-20 flex justify-start">
             <button
               onClick={() => window.location.reload()}
@@ -365,7 +378,8 @@ function App() {
 
         {/* Content Area: Main Feed Only (Sidebar Removed) */}
         {/* Landscape Mode: Use Flex Row to put controls on side, OR just tighter column */}
-        <div className="flex flex-col landscape:flex-row w-full h-full items-center justify-center relative flex-1 min-h-0 gap-4 landscape:gap-8">
+        {/* Desktop (lg) should revert to flex-col (Video Top, Controls Bottom) */}
+        <div className="flex flex-col landscape:flex-row lg:landscape:flex-col w-full h-full items-center justify-center relative flex-1 min-h-0 gap-4 landscape:gap-2 lg:landscape:gap-4">
 
           {/* Live Feed Container */}
           <div className={`
@@ -466,8 +480,9 @@ function App() {
           {/* Controls Section (Bottom or Right) */}
           <div className="mt-6 md:mt-12 w-full max-w-xl shrink-0 
               landscape:mt-0 landscape:w-[35%] landscape:h-full landscape:flex landscape:items-center
+              lg:landscape:mt-12 lg:landscape:w-full lg:landscape:h-auto lg:landscape:block
           ">
-            <div className="w-full landscape:scale-90 landscape:origin-center">
+            <div className="w-full landscape:scale-90 landscape:origin-center lg:landscape:scale-100">
               <Controls
                 onCapture={startCaptureSequence}
                 isCapturing={isCapturing}

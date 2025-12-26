@@ -22,9 +22,9 @@ export function WelcomeScreen({ onStart, isCameraReady }) {
             <div className="absolute inset-0 opacity-40 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] pointer-events-none"></div>
 
             <div className="relative z-10 max-w-md w-full flex flex-col items-center">
-                <div className="mb-8 relative">
+                <div className="mb-8 landscape:mb-4 lg:landscape:mb-8 relative">
                     <div className="absolute -inset-4 bg-retro-gold/20 blur-xl rounded-full opacity-50"></div>
-                    <h1 className="relative text-5xl md:text-7xl font-bold tracking-tighter text-retro-black font-serif">
+                    <h1 className="relative text-5xl md:text-7xl landscape:text-4xl lg:landscape:text-7xl font-bold tracking-tighter text-retro-black font-serif">
                         RetroBooth
                     </h1>
                 </div>
@@ -42,7 +42,7 @@ export function WelcomeScreen({ onStart, isCameraReady }) {
                 )}
 
                 {!mode ? (
-                    <div className="flex flex-col gap-4 w-full max-w-xs animate-in slide-in-from-bottom-5 duration-500 delay-100">
+                    <div className="flex flex-col landscape:flex-row lg:landscape:flex-col gap-4 w-full max-w-xs landscape:max-w-2xl lg:landscape:max-w-xs animate-in slide-in-from-bottom-5 duration-500 delay-100">
                         {/* Solo Mode */}
                         <button
                             onClick={() => onStart('solo')}
@@ -52,7 +52,7 @@ export function WelcomeScreen({ onStart, isCameraReady }) {
                             Solo Booth
                         </button>
 
-                        <div className="relative flex items-center py-2 opacity-50">
+                        <div className="relative flex items-center py-2 opacity-50 landscape:hidden lg:landscape:flex">
                             <div className="flex-grow border-t border-retro-black/20"></div>
                             <span className="flex-shrink mx-4 text-retro-black/40 text-xs uppercase tracking-widest">Or Duo Mode</span>
                             <div className="flex-grow border-t border-retro-black/20"></div>
@@ -63,9 +63,9 @@ export function WelcomeScreen({ onStart, isCameraReady }) {
                             disabled={!isCameraReady}
                             className="group relative w-full py-4 bg-retro-gold text-retro-black font-bold text-lg rounded-xl hover:scale-105 transition-all duration-300 shadow-lg disabled:opacity-50 disabled:scale-100 disabled:cursor-wait"
                         >
-                            <span className="relative z-10 flex items-center justify-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+                            <span className="relative z-10 w-full flex items-center justify-center gap-1 landscape:justify-between landscape:px-6 landscape:gap-0 lg:landscape:justify-center lg:landscape:px-0 lg:landscape:gap-1">
                                 Create Room
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
                             </span>
                         </button>
 

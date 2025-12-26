@@ -26,7 +26,7 @@ export function RoomJoin({ peerId, isHost, isConnected }) {
     // Assuming simple room code copying for Host.
     if (isHost) {
         return (
-            <div className="absolute top-6 left-6 z-50">
+            <div className="absolute top-6 left-6 z-50 landscape:left-auto landscape:right-6 lg:landscape:left-6 lg:landscape:right-auto">
                 {/* Copy Button */}
                 <button
                     onClick={copyId}

@@ -4,8 +4,14 @@ import Peer from 'peerjs';
 export function usePeer(localStream, onDataReceived) {
     const [peerId, setPeerId] = useState('');
     const [connections, setConnections] = useState([]);
+    const [peerError, setPeerError] = useState(null);
     const [remoteStream, setRemoteStream] = useState(null);
     const peerRef = useRef(null);
+    const connectionsRef = useRef([]);
+
+    useEffect(() => {
+        connectionsRef.current = connections;
+    }, [connections]);
 
     const streamRef = useRef(localStream);
 
@@ -39,16 +45,33 @@ export function usePeer(localStream, onDataReceived) {
         // Handle Errors
         peer.on('error', (err) => {
             console.error("PeerJS Error:", err);
-            // Retry logic or user notification could go here
+            setPeerError(err);
         });
 
         peer.on('connection', (conn) => {
             console.log("Incoming connection from:", conn.peer);
+
+            // 1. Capacity Check (Host side)
+            if (connectionsRef.current.length >= 1) {
+                console.warn("Room full! Rejecting from:", conn.peer);
+                conn.on('open', () => {
+                    conn.send({ type: 'ERROR', payload: 'ROOM_FULL' });
+                    setTimeout(() => conn.close(), 500);
+                });
+                return;
+            }
+
             handleConnection(conn);
         });
 
         peer.on('call', (call) => {
             console.log("Receiving call from:", call.peer);
+
+            // Capacity check for calls
+            if (connectionsRef.current.length >= 1 && !connectionsRef.current.find(c => c.peer === call.peer)) {
+                console.warn("Room full! Rejecting call.");
+                return;
+            }
 
             const answerCall = () => {
                 const currentStream = streamRef.current;
@@ -116,6 +139,7 @@ export function usePeer(localStream, onDataReceived) {
 
     const connectToPeer = (remotePeerId) => {
         if (!peerRef.current) return;
+        setPeerError(null);
 
         // Data Connection
         const conn = peerRef.current.connect(remotePeerId);
@@ -142,5 +166,5 @@ export function usePeer(localStream, onDataReceived) {
         connections.forEach(conn => conn.send(data));
     };
 
-    return { peerId, connectToPeer, broadcast, remoteStream };
+    return { peerId, connectToPeer, broadcast, remoteStream, connections, peerError };
 }

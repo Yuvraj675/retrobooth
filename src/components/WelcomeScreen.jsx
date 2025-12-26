@@ -1,8 +1,20 @@
 import React, { useState } from 'react';
 
-export function WelcomeScreen({ onStart, isCameraReady, cameraError }) {
+export function WelcomeScreen({ onStart, isCameraReady, cameraError, peerError, isConnecting }) {
     const [mode, setMode] = useState(null); // 'create' | 'join' | null
     const [roomId, setRoomId] = useState('');
+
+    // Deep Linking: Auto-fill room ID from URL
+    React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('room');
+        if (code) {
+            setRoomId(code);
+            setMode('join');
+            // Optional: Auto-submit if camera is ready?
+            // Better to let user click "Connect" to be sure they are ready.
+        }
+    }, []);
 
     const handleCreate = () => {
         if (!isCameraReady) return;
@@ -38,6 +50,17 @@ export function WelcomeScreen({ onStart, isCameraReady, cameraError }) {
                         <span className="bg-retro-rust/10 text-retro-rust px-4 py-2 rounded-full text-[10px] uppercase tracking-widest font-bold animate-pulse border border-retro-rust/20">
                             Initializing Camera...
                         </span>
+                    </div>
+                )}
+
+                {peerError && (
+                    <div className="absolute -top-32 left-0 right-0 flex justify-center px-4">
+                        <div className="bg-amber-50 text-amber-800 px-6 py-4 rounded-xl text-xs md:text-sm font-bold border border-amber-200 shadow-xl max-w-md animate-in slide-in-from-top-2">
+                            <div className="uppercase tracking-widest mb-1 text-[10px] text-amber-900">Connection Error</div>
+                            {peerError.type === 'peer-unavailable'
+                                ? "Room code not found. Please check the ID and try again."
+                                : `Connection failed: ${peerError.type}`}
+                        </div>
                     </div>
                 )}
 
@@ -101,18 +124,25 @@ export function WelcomeScreen({ onStart, isCameraReady, cameraError }) {
                                 onChange={(e) => setRoomId(e.target.value)}
                                 className="w-full bg-white border-2 border-retro-black/10 text-retro-black px-6 py-4 rounded-xl focus:outline-none focus:border-retro-gold focus:ring-1 focus:ring-retro-gold transition-all text-center text-lg placeholder:text-retro-black/30 font-serif"
                                 autoFocus
+                                disabled={isConnecting}
                             />
                         </div>
                         <button
                             type="submit"
-                            disabled={!roomId.trim() || !isCameraReady}
-                            className="w-full py-4 bg-retro-rust text-retro-cream font-bold text-lg rounded-xl hover:bg-retro-rust/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg"
+                            disabled={!roomId.trim() || !isCameraReady || isConnecting}
+                            className="w-full py-4 bg-retro-rust text-retro-cream font-bold text-lg rounded-xl hover:bg-retro-rust/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg flex items-center justify-center gap-2"
                         >
-                            Connect
+                            {isConnecting ? (
+                                <>
+                                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                    Connecting...
+                                </>
+                            ) : "Connect"}
                         </button>
                         <button
                             type="button"
                             onClick={() => setMode(null)}
+                            disabled={isConnecting}
                             className="text-retro-black/50 hover:text-retro-black text-xs uppercase tracking-widest font-bold transition-colors mt-2"
                         >
                             Cancel

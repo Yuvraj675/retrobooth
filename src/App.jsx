@@ -44,9 +44,53 @@ function App() {
     if (handleDataRef.current) handleDataRef.current(data);
   }, []);
 
-  const { peerId, connectToPeer, broadcast, remoteStream } = usePeer(localStream, stableHandler);
+  const { peerId, connectToPeer, broadcast, remoteStream, connections, peerError } = usePeer(localStream, stableHandler);
 
   // 3. Helper Functions (Defined BEFORE usages)
+
+  const [wasConnected, setWasConnected] = useState(false);
+
+  // Handle Host Disconnect / Room Errors
+  useEffect(() => {
+    // Track connection state
+    if (connections.length > 0) {
+      setWasConnected(true);
+    }
+
+    // HOST DISCONNECTED LOGIC
+    // Only trigger if we WERE connected and now are NOT.
+    if (role === 'guest' && hasStarted && wasConnected && connections.length === 0) {
+      alert("Host disconnected! Returning to menu.");
+      setHasStarted(false);
+      setRole('host');
+      setWasConnected(false); // Reset
+      window.location.reload();
+    }
+  }, [connections, role, hasStarted, wasConnected]);
+
+  // Handle Incoming Data (Stable Handler)
+  const onData = (data) => {
+    // ... existing data handling ...
+    if (data.type === 'ERROR' && data.payload === 'ROOM_FULL') {
+      alert("Room is full! Only 2 participants allowed.");
+      setHasStarted(false);
+      setRole('host');
+      window.location.reload();
+    }
+    if (data.type === 'SETTINGS_UPDATE') {
+      // ...
+      const { filterId, frameId } = data.payload;
+      if (filterId) setActiveFilter(FILTERS.find(f => f.id === filterId) || FILTERS[0]);
+      if (frameId) setActiveFrame(FRAMES.find(f => f.id === frameId) || FRAMES[0]);
+    }
+    // ...
+  };
+
+  // Re-assign ref for handling data
+  useEffect(() => {
+    handleDataRef.current = onData;
+  }, [role, hasStarted]); // Updates when role changes
+
 
   const onConnect = (id, isHostRole = true) => {
     connectToPeer(id);
@@ -54,16 +98,35 @@ function App() {
     if (!isHostRole) setIsReady(false);
   };
 
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  // Monitor Connection Success
+  useEffect(() => {
+    if (isConnecting && connections.length > 0) {
+      setIsConnecting(false);
+      setHasStarted(true);
+    }
+  }, [isConnecting, connections]);
+
+  // Monitor Connection Failure
+  useEffect(() => {
+    if (isConnecting && peerError) {
+      setIsConnecting(false);
+      // hasStarted remains false, WelcomeScreen shows error
+    }
+  }, [isConnecting, peerError]);
+
   const handleStart = (mode, roomId = null) => {
-    setHasStarted(true);
     if (mode === 'create') {
       setRole('host');
+      setHasStarted(true);
     } else if (mode === 'join' && roomId) {
       setRole('guest');
+      setIsConnecting(true); // Wait for connection...
       onConnect(roomId, false);
     } else if (mode === 'solo') {
       setRole('solo');
-      // No peer connection needed
+      setHasStarted(true);
     }
   };
 
@@ -262,6 +325,12 @@ function App() {
   const startCaptureSequence = async (isInitiator = true) => {
     if (isCapturing) return;
 
+    // Guest Readiness Check
+    if (role === 'host' && isInitiator && !remoteReady && connections.length > 0) {
+      alert("Guest is not ready! Please wait for them to click 'Ready'.");
+      return;
+    }
+
     if (isInitiator && role !== 'solo') {
       broadcast({ type: 'CAPTURE_START' });
     }
@@ -325,7 +394,7 @@ function App() {
   return (
     <div className="min-h-screen w-full bg-retro-cream text-retro-black flex flex-col items-center justify-center overflow-x-hidden relative selection:bg-retro-gold/30 font-sans-body">
 
-      {!hasStarted && <WelcomeScreen onStart={handleStart} isCameraReady={!!localStream} cameraError={cameraError} />}
+      {!hasStarted && <WelcomeScreen onStart={handleStart} isCameraReady={!!localStream} cameraError={cameraError} peerError={peerError} isConnecting={isConnecting} />}
 
       <RoomJoin
         peerId={peerId}

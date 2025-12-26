@@ -107,13 +107,13 @@ export function Controls({
             <div className="relative w-full landscape:w-full lg:w-1/3 flex justify-center order-3 landscape:order-2 lg:order-none lg:-mt-8 shrink-0">
                 <button
                     onClick={onCapture}
-                    disabled={role === 'host' && (!isConnected && !remoteReady)}
+                    disabled={role === 'host' && isConnected && !remoteReady}
                     className={`
                         w-16 h-16 landscape:w-20 landscape:h-20 md:w-28 md:h-28 lg:landscape:w-28 lg:landscape:h-28 rounded-full flex items-center justify-center transition-all bg-retro-cream 
                         shadow-[0_10px_40px_-10px_rgba(192,88,50,0.5)] border-4 md:border-8 border-retro-cream z-20 group aspect-square flex-none
-                        ${((role === 'host' && (!isConnected || remoteReady)) || role === 'solo')
-                            ? 'hover:scale-105 active:scale-95 cursor-pointer hover:shadow-[0_20px_60px_-15px_rgba(192,88,50,0.6)]'
-                            : 'opacity-50 cursor-not-allowed grayscale'
+                        ${(role === 'host' && isConnected && !remoteReady)
+                            ? 'opacity-50 cursor-not-allowed grayscale'
+                            : 'hover:scale-105 active:scale-95 cursor-pointer hover:shadow-[0_20px_60px_-15px_rgba(192,88,50,0.6)]'
                         }
                     `}
                 >

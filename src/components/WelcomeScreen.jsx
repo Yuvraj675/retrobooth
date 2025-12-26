@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export function WelcomeScreen({ onStart, isCameraReady }) {
+export function WelcomeScreen({ onStart, isCameraReady, cameraError }) {
     const [mode, setMode] = useState(null); // 'create' | 'join' | null
     const [roomId, setRoomId] = useState('');
 
@@ -33,11 +33,25 @@ export function WelcomeScreen({ onStart, isCameraReady }) {
                     Capture • Create • Collect
                 </p>
 
-                {!isCameraReady && (
+                {!isCameraReady && !cameraError && (
                     <div className="absolute -top-16 left-0 right-0 flex justify-center">
                         <span className="bg-retro-rust/10 text-retro-rust px-4 py-2 rounded-full text-[10px] uppercase tracking-widest font-bold animate-pulse border border-retro-rust/20">
                             Initializing Camera...
                         </span>
+                    </div>
+                )}
+
+                {cameraError && (
+                    <div className="absolute -top-24 left-0 right-0 flex justify-center px-4">
+                        <div className="bg-red-50 text-red-600 px-6 py-4 rounded-xl text-xs md:text-sm font-bold border border-red-200 shadow-xl max-w-md animate-in slide-in-from-top-2">
+                            <div className="uppercase tracking-widest mb-1 text-[10px] text-red-800">Camera Error</div>
+                            {cameraError.name === 'NotReadableError' || cameraError.name === 'TrackStartError'
+                                ? "Camera is being used by another app. Please close other apps and reload."
+                                : "Could not access camera. Please check permissions."}
+                            <button onClick={() => window.location.reload()} className="mt-2 block w-full bg-red-100 hover:bg-red-200 text-red-800 py-2 rounded-lg text-[10px] uppercase tracking-widest transition-colors">
+                                Reload Page
+                            </button>
+                        </div>
                     </div>
                 )}
 

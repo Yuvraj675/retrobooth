@@ -14,7 +14,9 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 
 function App() {
   // 1. Core State & Refs
-  const { stream: localStream } = useCamera();
+  const { stream: localStream, error: cameraError } = useCamera();
+
+
 
   // Refs for CANVAS CAPTURE (passed to VideoPlayer)
   const localVideoRef = useRef(null);
@@ -323,7 +325,7 @@ function App() {
   return (
     <div className="min-h-screen w-full bg-retro-cream text-retro-black flex flex-col items-center justify-center overflow-x-hidden relative selection:bg-retro-gold/30 font-sans-body">
 
-      {!hasStarted && <WelcomeScreen onStart={handleStart} isCameraReady={!!localStream} />}
+      {!hasStarted && <WelcomeScreen onStart={handleStart} isCameraReady={!!localStream} cameraError={cameraError} />}
 
       <RoomJoin
         peerId={peerId}

@@ -48,27 +48,40 @@ export function usePeer(localStream, onDataReceived) {
 
         peer.on('call', (call) => {
             console.log("Receiving call from:", call.peer);
-            const currentStream = streamRef.current;
-            if (!currentStream) {
-                console.warn("No local stream to answer call with!");
+
+            const answerCall = () => {
+                const currentStream = streamRef.current;
+                if (currentStream) {
+                    call.answer(currentStream);
+                    setupCallListeners(call);
+                } else {
+                    console.log("Stream not ready, waiting...");
+                    setTimeout(answerCall, 200); // Retry every 200ms
+                }
+            };
+
+            // Helper to attach listeners to avoid duplication
+            const setupCallListeners = (activeCall) => {
+                activeCall.on('stream', (stream) => {
+                    console.log("Received remote stream");
+                    setRemoteStream(stream);
+                });
+
+                activeCall.on('close', () => {
+                    console.log("Call closed");
+                    setRemoteStream(null);
+                });
+
+                activeCall.on('error', (err) => {
+                    console.error("Call error:", err);
+                    setRemoteStream(null);
+                });
             }
-            call.answer(currentStream); // Answer with our stream (or undefined if not ready)
 
-            call.on('stream', (stream) => {
-                console.log("Received remote stream");
-                setRemoteStream(stream);
-            });
-
-            call.on('close', () => {
-                console.log("Call closed");
-                setRemoteStream(null);
-            });
-
-            call.on('error', (err) => {
-                console.error("Call error:", err);
-                setRemoteStream(null);
-            });
+            answerCall();
         });
+
+
 
         peerRef.current = peer;
 

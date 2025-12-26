@@ -149,7 +149,7 @@ export function Controls({
             <div className="w-1/2 landscape:w-full lg:w-1/3 flex justify-evenly landscape:justify-center lg:justify-end gap-1 md:gap-8 items-center order-2 landscape:order-3 lg:order-none">
 
                 {/* Frame */}
-                <div className="w-12 landscape:w-10 flex flex-col items-center gap-1 group cursor-pointer" onClick={() => {
+                <div className="w-16 flex flex-col items-center gap-1 group cursor-pointer" onClick={() => {
                     const idx = FRAMES.findIndex(f => f.id === activeFrame.id);
                     const next = FRAMES[(idx + 1) % FRAMES.length];
                     onFrameChange(next);
@@ -158,8 +158,7 @@ export function Controls({
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="landscape:w-5 landscape:h-5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
                     </div>
                     <div className="w-full flex flex-col items-center leading-none mt-1">
-                        <span className="text-[10px] landscape:text-[8px] font-bold uppercase tracking-wider text-retro-black/80">Frame</span>
-                        <span className="text-[9px] landscape:hidden font-sans-body text-retro-black/60 uppercase tracking-widest truncate max-w-full text-center">{activeFrame.name.replace(' Frame', '')}</span>
+                        <span className="text-[10px] landscape:text-[8px] font-bold uppercase tracking-wider text-retro-black/80 truncate max-w-full text-center">{activeFrame.name.replace(' Frame', '')}</span>
                     </div>
                 </div>
 

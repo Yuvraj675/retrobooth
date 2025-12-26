@@ -334,7 +334,7 @@ function App() {
 
       {/* COUNTDOWN OVERLAY */}
       {countdown !== null && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/95 backdrop-blur-sm animate-in fade-in duration-200">
           <div key={countdown} className="text-[150px] md:text-[250px] font-bold text-retro-cream font-serif-display drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] animate-bounce-in">
             {countdown}
           </div>
@@ -342,7 +342,7 @@ function App() {
       )}
 
       {/* GLOBAL FLASH OVERLAY - Covers entire screen */}
-      <div className={`fixed inset-0 z-[9999] bg-white pointer-events-none transition-opacity duration-150 ease-out ${isFlashing ? 'opacity-100' : 'opacity-0'}`}></div>
+      <div className={`fixed inset-0 z-[9999] bg-white pointer-events-none transition-opacity ease-out ${isFlashing ? 'duration-0 opacity-100' : 'duration-700 opacity-0'}`}></div>
 
       {/* Main Container - Retro Theme */}
       <div className="relative w-full h-full max-w-[1600px] mx-auto p-4 md:p-8 flex flex-col items-center transition-all">

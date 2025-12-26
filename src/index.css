@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Work+Sans:wght@300;400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Work Sans', system-ui, sans-serif;
+  --color-cream: #FDFBF7;
+  --color-text-primary: #1a2e1a;
+  /* Dark Vintage Green/Black */
+  --color-gold: #D4AF37;
+  --color-rust: #C05832;
+  --font-display: 'DM Serif Display', serif;
+  --font-body: 'Work Sans', sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--color-cream);
+  color: var(--color-text-primary);
+  /* Vintage Grain Overlay is handled in App.jsx usually, or we can add it here via pseudo-element if needed */
+}
+
+/* Custom Utilities for Retro Look */
+@layer components {
+  .font-serif-display {
+    font-family: var(--font-display);
+  }
+
+  .text-retro-gold {
+    color: #9C824A;
+  }
+
+  .btn-vintage {
+    @apply transition-transform active:scale-95;
+  }
+}
